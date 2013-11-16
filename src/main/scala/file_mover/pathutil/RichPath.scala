@@ -6,6 +6,16 @@ import scala.concurrent.{Future, future, ExecutionContext}
 import ExecutionContext.Implicits.global
 import scala.collection.convert._
 
+<<<<<<< HEAD
+=======
+/**
+ * Created with IntelliJ IDEA.
+ * User: solus_000
+ * Date: 10/25/13
+ * Time: 11:39 PM
+ * To change this template use File | Settings | File Templates.
+ */
+>>>>>>> origin/master
 object RichPath {
   implicit def path2RichPath(p: Path) = new RichPath(p)
 }
