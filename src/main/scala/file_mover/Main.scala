@@ -2,7 +2,7 @@ package main
 
 import file_mover.pathutil.RichPath
 import java.io.FileReader
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Path, Files, Paths}
 
 import scala.concurrent.{Await, future, ExecutionContext}
 import ExecutionContext.Implicits.global
@@ -17,32 +17,42 @@ object Main extends App {
 
   val configFilePath = Paths.get("config.txt")
 
-  if (!Files.exists(configFilePath.getParent))
-    Files.createDirectory(configFilePath.getParent)
-
   if (!Files.exists(configFilePath))
     Files.createFile(configFilePath)
 
   val r = new FileReader(configFilePath.toFile)
   val watchList = parseAll(file, r).get
+  r.close()
 
   val watchFutures = watchList map { case (watchPath, moveList) => {
-    future { watch(watchPath) {
-      case Created(eventPath) => {
 
-        moveList foreach {
-          case (moveParams, movePath) => {
+    def performMove(ePath: Path) = {
+      moveList foreach {
+        case (moveParams, movePath) => {
 
-            if (moveParams contains (eventPath.extension)) {
-              val mover = new FileMover(movePath)
+          if (moveParams contains (ePath.extension)) {
+            val mover = new FileMover(movePath)
 
-              eventPath.downloadFinish.onSuccess {
-                case p => mover.move(p)
-              }
-
+            ePath.downloadFinish.onSuccess {
+              case p => mover.move(p)
             }
+
           }
         }
+      }
+    }
+
+    // Perform initial move on startup.
+    val dirStream = Files newDirectoryStream watchPath
+    val dirIt = dirStream.iterator
+    while(dirIt.hasNext)
+      performMove(dirIt.next)
+    dirStream.close()
+
+    future { watch(watchPath) {
+      case Created(eventPath) => {
+        println(eventPath)
+        performMove(eventPath)
       }
     }}
   }}

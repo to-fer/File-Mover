@@ -5,33 +5,40 @@ import file_mover.pathutil.RichPath._
 
 class FileMover(val destParent: Path) {
 
-  def move(pathToMove: Path) = {
-    val destPath = destParent resolve pathToMove.getFileName
-
-    if (Files.exists(destPath)) {
-      val destDigest = destPath.digest
+  def move(pathToMove: Path): Path = {
+	if (Files notExists pathToMove) throw new IllegalArgumentException("That path doesn't exist!")
+	
+    val tentativeDestPath = destParent resolve pathToMove.getFileName
+    val destPath =
+    if (Files.exists(tentativeDestPath)) {
+      val destDigest = tentativeDestPath.digest
       val srcDigest = pathToMove.digest
 
-      if (destDigest sameElements srcDigest)
-        Files.delete(pathToMove)
+      if (destDigest sameElements srcDigest) {
+        Files.delete(tentativeDestPath)
+        tentativeDestPath
+      }
       else {
-
         def insertEndingNum(num: Int): Path = {
-          val fileNameWithoutExt = destPath.getFileName.toString().dropRight(destPath.extension.length)
-          val fileNameWithNum = fileNameWithoutExt + "_" + num + destPath.extension
-          val newPath = Paths.get(destPath.getParent.toString, fileNameWithNum)
+          val fileName = pathToMove.getFileName.toString
+          val fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."))
+          val fileNameWithNum = fileNameWithoutExt + "_" + num + "." + tentativeDestPath.extension
+          val newPath = Paths.get(tentativeDestPath.getParent.toString, fileNameWithNum)
 
-          if (!Files.exists(newPath))
+          if (Files notExists newPath)
             newPath
           else
             insertEndingNum(num + 1)
         }
 
         val newDestPath = insertEndingNum(0)
-        Files.move(pathToMove, newDestPath)
+        newDestPath
       }
+
     }
-    else Files.move(pathToMove, destPath)
+    else tentativeDestPath
+
+    Files.move(pathToMove, destPath)
   }
 
 }

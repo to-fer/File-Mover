@@ -5,6 +5,7 @@ import java.security.{DigestInputStream, MessageDigest}
 import scala.concurrent.{Future, future, ExecutionContext}
 import ExecutionContext.Implicits.global
 import scala.collection.convert._
+import java.io.FileInputStream
 
 object RichPath {
   implicit def path2RichPath(p: Path) = new RichPath(p)
@@ -35,10 +36,13 @@ class RichPath(p: Path) {
 
       /* Sleep for a short time to make sure to give the file time to download a bit more before reading
          from it again. Otherwise we might read so fast that it will appear to not be downloading when that isn't the case.*/
-      Thread.sleep(50)
+      Thread.sleep(50) // DO NOT REMOVE THIS. I'M WARNING YOU!
       val curDigest = digest
 
-      if (!(curDigest sameElements prevDigest)) blockTillDownloadFinish(curDigest)
+      /* If the digests differ then the file is still downloading. If the file's size is 0 then it has not yet started to
+       * download, so we must wait longer.
+       */
+      if (!(curDigest sameElements prevDigest) || Files.size(p) == 0) blockTillDownloadFinish(curDigest)
     }
 
     blockTillDownloadFinish(List[Byte](0))
