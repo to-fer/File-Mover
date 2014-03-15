@@ -1,4 +1,4 @@
-package file_mover.pathutil
+package pathutil
 
 import java.nio.file.{Files, Path}
 import java.security.{DigestInputStream, MessageDigest}
