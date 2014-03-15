@@ -1,6 +1,5 @@
 package main
 
-import file_mover.pathutil.RichPath
 import java.io.FileReader
 import java.nio.file.{Path, Files, Paths}
 
@@ -11,7 +10,7 @@ import scala.concurrent.duration.Duration
 import watch.Watcher._
 import move.FileMover
 import config.ConfigFileParser._
-import RichPath._
+import pathutil.RichPath._
 
 object Main extends App {
 
