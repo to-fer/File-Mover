@@ -1,7 +1,7 @@
 package file_mover
 
 import _root_.move.FileMover
-import org.specs2.mutable.Specification
+import org.specs2.mutable._
 import java.nio.file.{Path, Files, Paths}
 
 // THESE TESTS ARE EXECUTED IN PARALLEL, BEWARE!
@@ -10,7 +10,8 @@ class FileMoverSpec extends Specification {
   def initPath(pathStr: String) = {
     val p = Paths.get(pathStr)
     if (Files exists p) throw new IllegalArgumentException(
-      s"Path $pathStr already exists! Check to make sure you aren't using the same path name in two separate tests."
+      s"Path $pathStr already exists! " +
+        "Check to make sure you aren't using the same path name in two separate tests or that a pervious test failed and couldn't delete the test files."
     )
     p
   }
@@ -33,6 +34,12 @@ class FileMoverSpec extends Specification {
     Files delete dir
   }
 
+  /* Neither of these tests test to see if the file exists in the correct location after a move has been performed.
+   * This is due to some kind of strangeness regarding Files.move(). It seems to schedule a move for later rather than
+   * doing it immediately, so any test to see if the file exists after a move is performed will fail despite the fact
+   * that the move was (or, rather, will be) successful. Thus, we assume that the move was successful, so long as an
+   * exception isn't thrown during the process, of course.
+   */
   "File Mover" should {
     "move" in {
       val destDir = testDir("move-dest-1")
@@ -61,6 +68,7 @@ class FileMoverSpec extends Specification {
       // Cleanup
       deleteDirectory(destDir)
 
+      movedPath mustEqual(destDir resolve pathToMove.getFileName)
       val fileName = movedPath.getFileName.toString
       fileName.endsWith("_0.txt") mustEqual true
     }
