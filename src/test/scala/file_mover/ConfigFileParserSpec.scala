@@ -9,30 +9,38 @@ import scala.util.parsing.input.CharSequenceReader
 class ConfigFileParserSpec extends Specification {
 
   "Parser" should {
+    val watchDir = Paths.get("C:", "dir")
+    val watchDefString = s"watch $watchDir"
+
+    val textFileMoveDir = Paths.get("C:", "move_dir")
+    val textFileMoveDef = List("txt", "doc")
+    val textFileMoveDefString = textFileMoveDef.mkString(", ") + s" => $textFileMoveDir"
+
+    val gifFileMoveDir = Paths.get("C:", "gif_dir")
+    val gifFileMoveDef = List("gif")
+    val gifFileMoveDefString = gifFileMoveDef(0) + s" => $gifFileMoveDir"
 
     "watchPath" in {
       implicit val parserToTest = watchPath
-      parsing ("watch C:\\dir") mustEqual(Paths.get("C:\\dir"))
+      parsing (watchDefString) mustEqual(watchDir)
     }
 
     "moveDef" in {
       implicit val parserToTest = moveDef
-      parsing ("txt, png => C:\\move_dir") mustEqual((List("txt", "png"), Paths.get("C:\\move_dir")))
+      parsing (textFileMoveDefString) mustEqual((textFileMoveDef, textFileMoveDir))
     }
 
     "watchDef" in {
       implicit val parserToTest = watchDef
       parsing (
-        """watch C:\\dir {
-          |  txt, png => C:\\move_dir
-          |  gif => C:\\gif_dir
-          |}""".stripMargin) mustEqual((Paths.get("C:\\dir"),List(
-                                                               (List("txt", "png"), Paths.get("C:\\move_dir")),
-                                                               (List("gif"), Paths.get("C:\\gif_dir"))
-                                                             )
-
-                                       )
-        )
+        s"""$watchDefString {
+          |  $textFileMoveDefString
+          |  $gifFileMoveDefString
+          |}""".stripMargin) mustEqual(watchDir , List(
+                                                        (textFileMoveDef, textFileMoveDir),
+                                                        (gifFileMoveDef, gifFileMoveDir)
+                                                      )
+                                      )
     }
   }
 
