@@ -69,7 +69,8 @@ class FileMoverSpec extends Specification {
       // Cleanup
       deleteDirectory(destDir)
 
-      movedPath mustEqual(destDir resolve pathToMove.getFileName)
+      val destFileNameWithNumberAdded = Paths.get((destDir resolve pathToMove.getFileName).toString.replace(".", "_0."))
+      movedPath mustEqual(destFileNameWithNumberAdded)
       val fileName = movedPath.getFileName.toString
       fileName.endsWith("_0.txt") mustEqual true
     }
