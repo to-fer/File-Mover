@@ -1,4 +1,4 @@
-package file_mover.main
+package main
 
 import file_mover.pathutil.RichPath
 import java.io.FileReader
