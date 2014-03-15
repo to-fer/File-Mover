@@ -1,4 +1,4 @@
-package file_mover
+package config
 
 import org.specs2.mutable.Specification
 
