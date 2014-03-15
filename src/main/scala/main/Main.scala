@@ -11,6 +11,8 @@ import watch.Watcher._
 import move.FileMover
 import config.ConfigFileParser._
 import pathutil.RichPath._
+import com.twitter.logging.Logger
+import com.twitter.logging.config.{FileHandlerConfig, LoggerConfig}
 
 object Main extends App {
 
@@ -21,6 +23,14 @@ object Main extends App {
   val watchList = parseAll(file, r).get
   r.close()
 
+  val logger = Logger.get(getClass)
+  val config = new LoggerConfig {
+    handlers = new FileHandlerConfig {
+      filename = "file-mover-log.log"
+    }
+  }
+  config()
+
   val watchFutures = watchList map {
     case (watchPath, moveList) => {
       def performMove(ePath: Path) = {
@@ -28,14 +38,25 @@ object Main extends App {
           case (moveParams, movePath) => {
             if (moveParams contains (ePath.extension)) {
               val mover = new FileMover(movePath)
+
+              logger.info(s"About to move $movePath. If you don't see a move-conformation message, then there was a " +
+                           "problem, probably with detecting when the file to be moved finished downloading.")
+
               ePath.downloadFinish.onSuccess {
-                case p => mover.move(p)
+                case p => {
+                  logger.info(s"Moving $movePath")
+
+                  mover.move(p)
+
+                  logger.info("Move successful.")
+                }
               }
             }
           }
         }
       }
 
+      logger.info(s"Performing initial move of files in $watchPath.")
       // Perform initial move on startup.
       val dirStream = Files newDirectoryStream watchPath
       val dirIt = dirStream.iterator
@@ -43,10 +64,12 @@ object Main extends App {
         performMove(dirIt.next)
       dirStream.close()
 
+      logger.info(s"Watching $watchPath")
       future {
         watch(watchPath) {
           case Created(eventPath) => {
-            println(eventPath)
+            logger.info(s"File creation detected: $eventPath")
+
             performMove(eventPath)
           }
         }
