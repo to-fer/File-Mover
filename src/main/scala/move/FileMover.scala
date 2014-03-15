@@ -1,7 +1,7 @@
 package move
 
 import java.nio.file.{Paths, Path, Files}
-import file_mover.pathutil.RichPath._
+import pathutil.RichPath._
 
 class FileMover(val destParent: Path) {
 
