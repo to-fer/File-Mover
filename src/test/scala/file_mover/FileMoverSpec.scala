@@ -1,6 +1,6 @@
 package file_mover
 
-import _root_.move.FileMover
+import move.FileMover
 import org.specs2.mutable._
 import java.nio.file.{Path, Files, Paths}
 

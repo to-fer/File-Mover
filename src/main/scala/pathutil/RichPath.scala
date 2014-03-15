@@ -4,8 +4,6 @@ import java.nio.file.{Files, Path}
 import java.security.{DigestInputStream, MessageDigest}
 import scala.concurrent.{Future, future, ExecutionContext}
 import ExecutionContext.Implicits.global
-import scala.collection.convert._
-import java.io.FileInputStream
 
 object RichPath {
   implicit def path2RichPath(p: Path) = new RichPath(p)
