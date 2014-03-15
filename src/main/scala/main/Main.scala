@@ -15,10 +15,8 @@ import pathutil.RichPath._
 object Main extends App {
 
   val configFilePath = Paths.get("config.txt")
-
   if (!Files.exists(configFilePath))
     Files.createFile(configFilePath)
-
   val r = new FileReader(configFilePath.toFile)
   val watchList = parseAll(file, r).get
   r.close()
