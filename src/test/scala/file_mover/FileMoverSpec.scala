@@ -35,6 +35,11 @@ class FileMoverSpec extends Specification {
     Files delete dir
   }
 
+  def createFileWithContents(filePath: Path, fileContents: String) = {
+    if (Files notExists filePath) Files createFile filePath
+    Files.write(filePath, fileContents.getBytes)
+  }
+
   /* Neither of these tests test to see if the file exists in the correct location after a move has been performed.
    * This is due to some kind of strangeness regarding Files.move(). It seems to schedule a move for later rather than
    * doing it immediately, so any test to see if the file exists after a move is performed will fail despite the fact
@@ -55,13 +60,12 @@ class FileMoverSpec extends Specification {
       movedPath mustEqual(destDir resolve pathToMove.getFileName)
     }
 
-    "move('path that already exists')" in {
+    "move('path that already exists that doesn't denote an identical file')" in {
       val destDir = testDir("move-dest-2")
       val pathToMove = testPath("move-test-2.txt")
       
       val destDirContents = destDir.resolve(pathToMove.getFileName)
-      if (Files notExists destDirContents) Files createFile destDirContents
-      Files.write(destDirContents, "test".getBytes)
+      createFileWithContents(destDirContents, "test")
 
 	    val mover = new FileMover(destDir)
       val movedPath = mover.move(pathToMove)
@@ -73,6 +77,24 @@ class FileMoverSpec extends Specification {
       movedPath mustEqual(destFileNameWithNumberAdded)
       val fileName = movedPath.getFileName.toString
       fileName.endsWith("_0.txt") mustEqual true
+    }
+
+    "move('path that already exists and denotes a duplicate file')" in {
+      val destDir = testDir("duplicate-move-dest")
+      val pathToMove = testPath("duplicate-test.txt")
+      val fileContents = "test file contents"
+      Files.write(pathToMove, fileContents.getBytes)
+
+      val destDirContents = destDir.resolve(pathToMove.getFileName)
+      createFileWithContents(destDirContents, fileContents)
+
+      val mover = new FileMover(destDir)
+      val movedPath = mover.move(pathToMove)
+
+      // Cleanup
+      deleteDirectory(destDir)
+
+      movedPath.toString.contains("_") mustEqual false
     }
   }
 }
