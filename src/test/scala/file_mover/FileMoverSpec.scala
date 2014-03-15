@@ -5,6 +5,7 @@ import org.specs2.mutable._
 import java.nio.file.{Path, Files, Paths}
 
 // THESE TESTS ARE EXECUTED IN PARALLEL, BEWARE!
+// (Use different paths in each test.)
 class FileMoverSpec extends Specification {
 
   def initPath(pathStr: String) = {
