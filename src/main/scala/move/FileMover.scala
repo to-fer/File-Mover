@@ -21,7 +21,7 @@ class FileMover(val destParent: Path) {
       }
       else {
         // The two files aren't the same file, so we can just append an underscore and number to the end of the file to
-        // be moved and move it to eliminate the path-conflict and move on (;D).
+        // be moved to eliminate the pathname conflict and move on (;D).
         def insertEndingNum(num: Int): Path = {
           val fileName = pathToMove.getFileName.toString
           val fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."))
