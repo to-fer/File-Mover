@@ -24,18 +24,14 @@ object Main extends App {
   r.close()
 
   val watchFutures = watchList map { case (watchPath, moveList) => {
-
     def performMove(ePath: Path) = {
       moveList foreach {
         case (moveParams, movePath) => {
-
           if (moveParams contains (ePath.extension)) {
             val mover = new FileMover(movePath)
-
             ePath.downloadFinish.onSuccess {
               case p => mover.move(p)
             }
-
           }
         }
       }
