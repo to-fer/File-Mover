@@ -3,36 +3,16 @@ package file_mover
 import move.FileMover
 import org.specs2.mutable._
 import java.nio.file.{Path, Files, Paths}
+import org.specs2.matcher.MatchResult
 
 // THESE TESTS ARE EXECUTED IN PARALLEL, BEWARE!
 // (Use different paths in each test.)
 class FileMoverSpec extends Specification {
 
-  def initPath(pathStr: String) = {
-    val p = Paths.get(pathStr)
-    if (Files exists p) throw new IllegalArgumentException(
-      s"Path $pathStr already exists! " +
-        "Check to make sure you aren't using the same path name in two separate tests or that a pervious test failed and couldn't delete the test files."
-    )
-    p
-  }
-
-  def testPath(pathStr: String) = {
-    val p = initPath(pathStr)
-    Files createFile p
-    p
-  }
-
-  def testDir(dirStr: String) = {
-    val dir = initPath(dirStr)
-    Files createDirectory dir
-    dir
-  }
-
   def deleteDirectory(dir: Path) = {
     for(files <- Option(dir.toFile.listFiles);
         file <- files) file.delete()
-    Files delete dir
+    Files deleteIfExists dir
   }
 
   def createFileWithContents(filePath: Path, fileContents: String) = {
@@ -40,61 +20,74 @@ class FileMoverSpec extends Specification {
     Files.write(filePath, fileContents.getBytes)
   }
 
-  /* Neither of these tests test to see if the file exists in the correct location after a move has been performed.
-   * This is due to some kind of strangeness regarding Files.move(). It seems to schedule a move for later rather than
-   * doing it immediately, so any test to see if the file exists after a move is performed will fail despite the fact
-   * that the move was (or, rather, will be) successful. Thus, we assume that the move was successful, so long as an
-   * exception isn't thrown during the process, of course.
-   */
   "File Mover" should {
     "move" in {
-      val destDir = testDir("move-dest-1")
-      val pathToMove = testPath("move-test-1.txt")
+      fileMoverTest("move-dest-1", "move-test-1.txt") {
+        (destDir, pathToMove) => {
+          val mover = new FileMover(destDir)
+          val movedPath = mover.move(pathToMove)
 
-      val mover = new FileMover(destDir)
-      val movedPath = mover.move(pathToMove)
-
-      // Cleanup
-      deleteDirectory(destDir)
-
-      movedPath mustEqual(destDir resolve pathToMove.getFileName)
+          movedPath mustEqual(destDir resolve pathToMove.getFileName)
+          Files.exists(movedPath) mustEqual true
+        }
+      }
     }
 
     "move('path that already exists that doesn't denote an identical file')" in {
-      val destDir = testDir("move-dest-2")
-      val pathToMove = testPath("move-test-2.txt")
-      
-      val destDirContents = destDir.resolve(pathToMove.getFileName)
-      createFileWithContents(destDirContents, "test")
+      fileMoverTest("move-dest-2", "move-test-2.txt") {
+        (destDir, pathToMove) => {
+          val destDirContents = destDir.resolve(pathToMove.getFileName)
+          createFileWithContents(destDirContents, "test")
 
-	    val mover = new FileMover(destDir)
-      val movedPath = mover.move(pathToMove)
+          val mover = new FileMover(destDir)
+          val movedPath = mover.move(pathToMove)
 
-      // Cleanup
-      deleteDirectory(destDir)
-
-      val destFileNameWithNumberAdded = Paths.get((destDir resolve pathToMove.getFileName).toString.replace(".", "_0."))
-      movedPath mustEqual(destFileNameWithNumberAdded)
-      val fileName = movedPath.getFileName.toString
-      fileName.endsWith("_0.txt") mustEqual true
+          val destFileNameWithNumberAdded = Paths.get((destDir resolve pathToMove.getFileName).toString.replace(".", "_0."))
+          movedPath mustEqual(destFileNameWithNumberAdded)
+          val fileName = movedPath.getFileName.toString
+          fileName.endsWith("_0.txt") mustEqual true
+          Files.exists(movedPath) mustEqual true
+        }
+      }
     }
 
     "move('path that already exists and denotes a duplicate file')" in {
-      val destDir = testDir("duplicate-move-dest")
-      val pathToMove = testPath("duplicate-test.txt")
-      val fileContents = "test file contents"
-      Files.write(pathToMove, fileContents.getBytes)
+      fileMoverTest("duplicate-move-dest", "duplicate-test.txt") {
+        (destDir, pathToMove) => {
+          val fileContents = "test file contents"
+          Files.write(pathToMove, fileContents.getBytes)
 
-      val destDirContents = destDir.resolve(pathToMove.getFileName)
-      createFileWithContents(destDirContents, fileContents)
+          val destDirContents = destDir.resolve(pathToMove.getFileName)
+          createFileWithContents(destDirContents, fileContents)
 
-      val mover = new FileMover(destDir)
-      val movedPath = mover.move(pathToMove)
+          val mover = new FileMover(destDir)
+          val movedPath = mover.move(pathToMove)
 
-      // Cleanup
-      deleteDirectory(destDir)
+          movedPath.toString.contains("_") mustEqual false
+          Files.exists(movedPath) mustEqual true
+        }
+      }
+    }
 
-      movedPath.toString.contains("_") mustEqual false
+    /*
+     * This method is used to guarantee that the paths involved in a test are deleted before and after each test.
+     * I didn't use the facilities for this provided by specs2 because the methods specs2 uses don't have parameters.
+     * This method also acts as a convenience method for initializing the paths to be used in the test
+     */
+    def fileMoverTest(dirPath: String, filePath: String)(testBlock: (Path, Path) => MatchResult[_]): MatchResult[_] = {
+      val testDestDir = Paths.get(dirPath)
+      deleteDirectory(testDestDir)
+      Files createDirectory testDestDir
+
+      val testFile = Paths.get(filePath)
+      Files deleteIfExists testFile
+      Files createFile testFile
+
+      val matchResult = testBlock(testDestDir, testFile)
+
+      deleteDirectory(testDestDir)
+
+      matchResult
     }
   }
 }
