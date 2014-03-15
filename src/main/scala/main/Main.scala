@@ -48,12 +48,14 @@ object Main extends App {
       performMove(dirIt.next)
     dirStream.close()
 
-    future { watch(watchPath) {
-      case Created(eventPath) => {
-        println(eventPath)
-        performMove(eventPath)
+    future {
+      watch(watchPath) {
+        case Created(eventPath) => {
+          println(eventPath)
+          performMove(eventPath)
+        }
       }
-    }}
+    }
   }}
 
   watchFutures foreach (Await.ready(_, Duration.Inf))
