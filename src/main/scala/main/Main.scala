@@ -33,22 +33,22 @@ object Main extends App {
 
   val watchFutures = watchList map {
     case (watchPath, moveList) => {
-      def performMove(ePath: Path) = {
+      def performMove(eventPath: Path) = {
         moveList foreach {
           case (moveParams, movePath) => {
-            if (moveParams contains (ePath.extension)) {
+            if (moveParams contains (eventPath.extension)) {
               val mover = new FileMover(movePath)
 
-              logger.info(s"About to move $movePath. If you don't see a move-conformation message, then there was a " +
+              logger.info(s"About to move $eventPath. If you don't see a move-conformation message, then there was a " +
                            "problem, probably with detecting when the file to be moved finished downloading.")
 
-              ePath.downloadFinish.onSuccess {
+              eventPath.downloadFinish.onSuccess {
                 case p => {
-                  logger.info(s"Moving $movePath")
+                  logger.info(s"Moving $eventPath")
 
-                  mover.move(p)
+                  val eventPathAfterMove = mover.move(p)
 
-                  logger.info("Move successful.")
+                  logger.info(s"$eventPath moved to $eventPathAfterMove.")
                 }
               }
             }
