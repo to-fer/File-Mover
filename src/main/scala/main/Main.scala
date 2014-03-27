@@ -21,9 +21,9 @@ object Main extends App {
   val configFilePath = Paths.get("config.txt")
   if (!Files.exists(configFilePath))
     Files.createFile(configFilePath)
-  val r = new FileReader(configFilePath.toFile)
-  val watchList = parseAll(file, r).get
-  r.close()
+  val configFileReader = new FileReader(configFilePath.toFile)
+  val watchList = parseAll(file, configFileReader).get
+  configFileReader.close()
 
   val logger = Logger.get(getClass)
   val config = new LoggerConfig {
