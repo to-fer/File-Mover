@@ -7,7 +7,7 @@ import java.nio.file.Path
  * Configuration file example:
  *
  * watch /dir/to/watch/goes/here {
- *   ext1, ext2, ext3 => /path/to/move/files/with/these/extensions
+ *   ext1, ext2, ext3 => dest/path/to/move/files/with/these/extensions/to
  *   ext4 => /another/move/path
  * }
  */
