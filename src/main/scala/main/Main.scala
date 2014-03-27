@@ -28,7 +28,7 @@ object Main extends App {
   val logger = Logger.get(getClass)
   val config = new LoggerConfig {
     handlers = new FileHandlerConfig {
-      filename = "file-mover-log.log"
+      filename = "file-mover.log"
     }
   }
   config()
