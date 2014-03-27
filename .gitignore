@@ -1,4 +1,5 @@
-*
-!src/
-!build.sbt
+.*
 !.gitignore
+project
+target
+classes
