@@ -33,6 +33,15 @@ object Main extends App {
   }
   config()
 
+  var downloadSet = Set[Path]()
+  sys addShutdownHook {
+    if (!downloadSet.isEmpty) {
+      downloadSet foreach { filePath => {
+        logger.warning(s"$filePath's download was interrupted and was not moved.")
+      }}
+    }
+  }
+  
   val watchFutures = watchList map {
     case (watchPath, moveList) => {
       def performMove(eventPath: Path) = {
@@ -42,15 +51,18 @@ object Main extends App {
               val mover = new FileMover(movePath)
 
               logger.info(s"About to move $eventPath.")
-
+              downloadSet = downloadSet + eventPath
               eventPath.downloadFinish(Duration.create(1, TimeUnit.HOURS)).onComplete {
                 case Success(_) => {
                   logger.info(s"Moving $eventPath")
                   val eventPathAfterMove = mover.move(eventPath)
                   logger.info(s"$eventPath moved to $eventPathAfterMove.")
+                  downloadSet = downloadSet - eventPath
                 }
-                case Failure(_) =>
+                case Failure(_) => {
                   logger.error(s"$eventPath has not been moved. It took too long to download.")
+                  downloadSet = downloadSet - eventPath
+                }
               }
             }
           }
