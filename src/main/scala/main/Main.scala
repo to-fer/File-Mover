@@ -41,8 +41,7 @@ object Main extends App {
             if (moveParams contains (eventPath.extension)) {
               val mover = new FileMover(movePath)
 
-              logger.info(s"About to move $eventPath. If you don't see a move-conformation message, then there was a " +
-                           "problem, probably with detecting when the file to be moved finished downloading.")
+              logger.info(s"About to move $eventPath.")
 
               eventPath.downloadFinish(Duration.create(1, TimeUnit.HOURS)).onComplete {
                 case Success(_) => {
