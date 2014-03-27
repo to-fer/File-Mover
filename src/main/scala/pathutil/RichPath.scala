@@ -6,8 +6,6 @@ import scala.concurrent.{Future, future, ExecutionContext}
 import ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import java.util.concurrent.{TimeoutException, TimeUnit}
-import scala.util.parsing.combinator.Parsers
-import scala.util.Failure
 
 object RichPath {
   implicit def path2RichPath(p: Path) = new RichPath(p)
