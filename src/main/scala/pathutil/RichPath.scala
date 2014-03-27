@@ -22,8 +22,8 @@ class RichPath(delegatePath: Path) {
 
   def digest: List[Byte] = {
     val digest = MessageDigest.getInstance("MD5")
-    val is = Files.newInputStream(delegatePath)
-    val digestStream = new DigestInputStream(is, digest)
+    val inputStream = Files.newInputStream(delegatePath)
+    val digestStream = new DigestInputStream(inputStream, digest)
 
     while(digestStream.read(new Array[Byte](1 << 16)) != -1){}
 
