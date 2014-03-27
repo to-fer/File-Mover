@@ -19,7 +19,7 @@ class RichPathSpec extends Specification {
       extensionPath.extension mustEqual extention
     }
 
-    "digest" in {
+    "digest of two files with differing contents are different" in {
       val firstTestPath = Paths.get("test.txt")
       if (!Files.exists(firstTestPath))
         Files.createFile(firstTestPath)
@@ -38,6 +38,27 @@ class RichPathSpec extends Specification {
       Files delete secondTestPath
 
       firstTestFileDigest mustNotEqual secondTestFileDigest
+    }
+
+    "digest of two identical files are the same" in {
+      val firstTestPath = Paths.get("identical-test-1.txt")
+      if (!Files.exists(firstTestPath))
+        Files.createFile(firstTestPath)
+      val firstTestFileContents = "test"
+      Files.write(firstTestPath, firstTestFileContents.getBytes)
+
+      val secondTestPath = Paths.get("identical-test-2.txt")
+      if (!Files.exists(secondTestPath))
+        Files.createFile(secondTestPath)
+      Files.write(secondTestPath, firstTestFileContents.getBytes)
+
+      val firstTestFileDigest = firstTestPath.digest
+      val secondTestFileDigest = secondTestPath.digest
+
+      Files delete firstTestPath
+      Files delete secondTestPath
+
+      firstTestFileDigest mustEqual secondTestFileDigest
     }
 
     "downloadFinish" in {
