@@ -6,7 +6,7 @@ import java.nio.file.{Path, Files, Paths}
 import org.specs2.matcher.MatchResult
 
 // THESE TESTS ARE EXECUTED IN PARALLEL, BEWARE!
-// (Use different paths in each test.)
+// Use different paths in each test to avoid problems.
 class FileMoverSpec extends Specification {
 
   def deleteDirectory(dir: Path) = {
@@ -70,9 +70,8 @@ class FileMoverSpec extends Specification {
     }
 
     /*
-     * This method is used to guarantee that the paths involved in a test are deleted before and after each test.
-     * I didn't use the facilities for this provided by specs2 because the methods specs2 uses don't have parameters.
-     * This method also acts as a convenience method for initializing the paths to be used in the test
+     * Used to guarantee that the paths involved in a test are deleted before and after each test.
+     * Also acts as a convenience method for initializing the paths to be used in the test.
      */
     def fileMoverTest(dirPath: String, filePath: String)(testBlock: (Path, Path) => MatchResult[_]): MatchResult[_] = {
       val testDestDir = Paths.get(dirPath)
