@@ -40,7 +40,7 @@ class RichPathSpec extends Specification {
       firstTestFileDigest mustNotEqual secondTestFileDigest
     }
 
-    "digests of two identical files are the same" in {
+    "digests of two identical files are equal" in {
       val firstTestPath = Paths.get("identical-test-1.txt")
       if (!Files.exists(firstTestPath))
         Files.createFile(firstTestPath)

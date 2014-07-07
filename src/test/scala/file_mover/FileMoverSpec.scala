@@ -22,7 +22,7 @@ class FileMoverSpec extends Specification {
 
   "File Mover" should {
     "move" in {
-      fileMoverTest("move-dest-1", "move-test-1.txt") {
+      fileMoverTest("move-dest-1", "move-source-1.txt") {
         (destDir, pathToMove) => {
           val mover = new FileMover(destDir)
           val movedPath = mover.move(pathToMove)
@@ -33,8 +33,8 @@ class FileMoverSpec extends Specification {
       }
     }
 
-    "move('path that already exists that doesn't denote an identical file')" in {
-      fileMoverTest("move-dest-2", "move-test-2.txt") {
+    "move('path to file that exists in destination and the already existing file's contents aren't identical to its')" in {
+      fileMoverTest("move-dest-2", "move-source-2.txt") {
         (destDir, pathToMove) => {
           val destDirContents = destDir.resolve(pathToMove.getFileName)
           createFileWithContents(destDirContents, "test")
@@ -51,8 +51,8 @@ class FileMoverSpec extends Specification {
       }
     }
 
-    "move('path that already exists and denotes a duplicate file')" in {
-      fileMoverTest("duplicate-move-dest", "duplicate-test.txt") {
+    "move('path to file that exists in destination and the already existing file's contents are identical to its')" in {
+      fileMoverTest("duplicate-move-dest", "duplicate-move-source.txt") {
         (destDir, pathToMove) => {
           val fileContents = "test file contents"
           Files.write(pathToMove, fileContents.getBytes)
