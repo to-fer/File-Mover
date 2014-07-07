@@ -2,7 +2,8 @@ package config
 
 import org.specs2.mutable.Specification
 
-import _root_.config.ConfigFileParser._
+import _root_.config.ConfigFileParser
+import ConfigFileParser._
 import java.nio.file.Paths
 import scala.util.parsing.input.CharSequenceReader
 
@@ -21,17 +22,17 @@ class ConfigFileParserSpec extends Specification {
     val gifFileMoveDefString = gifFileMoveDef(0) + s" => $gifFileMoveDir"
 
     "watchPath" in {
-      implicit val parserToTest = watchPath
+      implicit val parserToTest = ConfigFileParser.watchPath
       parsing (watchDefString) mustEqual(watchDir)
     }
 
     "moveDef" in {
-      implicit val parserToTest = moveDef
+      implicit val parserToTest = ConfigFileParser.moveDef
       parsing (textFileMoveDefString) mustEqual((textFileMoveDef, textFileMoveDir))
     }
 
     "watchDef" in {
-      implicit val parserToTest = watchDef
+      implicit val parserToTest = ConfigFileParser.watchDef
       parsing (
         s"""$watchDefString {
           |  $textFileMoveDefString
@@ -45,11 +46,11 @@ class ConfigFileParserSpec extends Specification {
   }
 
   private def parsing[T] (s: String)(implicit p: Parser[T]): T = {
-    val phraseParser = phrase(p)
+    val phraseParser = ConfigFileParser.phrase(p)
     val input = new CharSequenceReader(s)
     phraseParser(input) match {
-      case Success(t: T,_)     => t
-      case Failure(msg,_) => throw new IllegalArgumentException(
+      case Success(t: T, _)     => t
+      case Failure(msg, _) => throw new IllegalArgumentException (
         "Could not parse '" + s + "': " + msg)
     }
   }
