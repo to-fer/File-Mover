@@ -63,14 +63,13 @@ object Main extends App {
         moveList foreach {
           case (moveParams, movePath) => {
             if (moveParams contains (eventPath.extension)) {
-              val mover = new FileMover(movePath)
 
               logger.info(s"About to move $eventPath.")
               downloadSet = downloadSet + eventPath
               eventPath.downloadFinish(Duration.create(1, TimeUnit.HOURS)).onComplete {
                 case Success(_) => {
                   logger.info(s"Moving $eventPath")
-                  val eventPathAfterMove = mover.move(eventPath)
+                  val eventPathAfterMove = FileUtil.move(eventPath, movePath)
                   logger.info(s"$eventPath moved to $eventPathAfterMove.")
                   downloadSet = downloadSet - eventPath
                 }
