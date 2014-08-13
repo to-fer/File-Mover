@@ -36,10 +36,11 @@ object Main extends App {
   val watchList = parseAll(file, configFileReader).get
   configFileReader.close()
 
+  val logFile = configFilePath.getParent resolve "mover_log.log"
   val logger = Logger.get(getClass)
   val config = new LoggerConfig {
     handlers = new FileHandlerConfig {
-      filename = "file-mover.log"
+      filename = logFile.toString
     }
   }
   config()
