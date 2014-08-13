@@ -21,7 +21,7 @@ class FileMoverSpec extends Specification {
   }
 
   "File Mover" should {
-    "file" in {
+    "move" in {
       fileMoverTest("move-dest-1", "move-source-1.txt") {
         (destDir, pathToMove) => {
           val mover = new FileMover(destDir)
