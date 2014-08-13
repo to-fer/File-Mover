@@ -18,9 +18,20 @@ import scala.util.{Failure, Success}
 
 object Main extends App {
 
-  val configFilePath = Paths.get("config.txt")
-  if (!Files.exists(configFilePath))
+  val osName = sys props "os.name"
+  val homeDir = sys env "HOME"
+  val configFilePath =
+    if (osName.contains("Linux"))
+      Paths.get(homeDir, ".config", "file_mover", "move")
+    else if (osName.contains("Windows"))
+      Paths.get(homeDir, ".file_mover", "move.txt")
+    else
+      Paths.get("move.txt")
+  if (!Files.exists(configFilePath)) {
+    Files.createDirectories(configFilePath.getParent)
     Files.createFile(configFilePath)
+  }
+
   val configFileReader = new FileReader(configFilePath.toFile)
   val watchList = parseAll(file, configFileReader).get
   configFileReader.close()
@@ -41,7 +52,10 @@ object Main extends App {
       }}
     }
   }
-  
+
+  if (watchList.isEmpty)
+    logger.warning(s"There are no move rules specified in $configFilePath.")
+
   val watchFutures = watchList map {
     case (watchPath, moveList) => {
       def performMove(eventPath: Path) = {
