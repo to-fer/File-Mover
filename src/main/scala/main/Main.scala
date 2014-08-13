@@ -8,7 +8,7 @@ import ExecutionContext.Implicits.global
 
 import scala.concurrent.duration.Duration
 import watch.Watcher._
-import move.FileMover
+import file.FileUtil
 import config.ConfigFileParser._
 import pathutil.RichPath._
 import com.twitter.logging.Logger
@@ -22,7 +22,7 @@ object Main extends App {
   val homeDir = sys env "HOME"
   val configFilePath =
     if (osName.contains("Linux"))
-      Paths.get(homeDir, ".config", "file_mover", "move")
+      Paths.get(homeDir, ".config", "file_mover", "file")
     else if (osName.contains("Windows"))
       Paths.get(homeDir, ".file_mover", "move.txt")
     else

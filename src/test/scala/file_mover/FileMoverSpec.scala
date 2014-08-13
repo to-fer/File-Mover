@@ -1,6 +1,6 @@
 package file_mover
 
-import move.FileMover
+import file.FileUtil
 import org.specs2.mutable._
 import java.nio.file.{Path, Files, Paths}
 import org.specs2.matcher.MatchResult
@@ -21,7 +21,7 @@ class FileMoverSpec extends Specification {
   }
 
   "File Mover" should {
-    "move" in {
+    "file" in {
       fileMoverTest("move-dest-1", "move-source-1.txt") {
         (destDir, pathToMove) => {
           val mover = new FileMover(destDir)
