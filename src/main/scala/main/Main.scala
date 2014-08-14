@@ -9,7 +9,6 @@ import config.ConfigFileParser._
 import _root_.file.FileMover
 import watch.Watcher._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, future}
 
