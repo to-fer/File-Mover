@@ -49,9 +49,10 @@ class ConfigFileParserSpec extends Specification {
     val phraseParser = ConfigFileParser.phrase(p)
     val input = new CharSequenceReader(s)
     phraseParser(input) match {
-      case Success(t: T, _)     => t
+      case Success(t, _)     => t
       case Failure(msg, _) => throw new IllegalArgumentException (
         "Could not parse '" + s + "': " + msg)
+      case _ => throw new IllegalArgumentException(s"Could not parse $s!")
     }
   }
 
