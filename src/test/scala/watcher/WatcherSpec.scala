@@ -1,5 +1,6 @@
 
 import java.nio.file.{Files, Path, Paths}
+import java.util.concurrent.TimeUnit
 
 import org.specs2.mutable._
 import watch.Watcher._
@@ -23,11 +24,11 @@ class WatcherSpec extends Specification {
       }
 
       // static watch method takes some time to start watching, so we have to wait a bit before making files.
-      Thread.sleep(100)
+      Thread.sleep(1000)
       watchDirContents foreach { p => Files.createFile(p) }
 
       // wait for the watch method to finish handling all events.
-      Await.ready(watchFuture, Duration(1000, "milliseconds"))
+      Await.ready(watchFuture, Duration(5, TimeUnit.SECONDS))
 
       // cleanup
       deleteWatchDirectory(watchDir, watchDirContents)
