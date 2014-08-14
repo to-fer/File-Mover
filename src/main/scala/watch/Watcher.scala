@@ -10,7 +10,7 @@ object Watcher {
   case class Deleted(override val eventPath: Path) extends Event(eventPath)
   case class Modified(override val eventPath: Path) extends Event(eventPath)
 
-  def watch(watchPath: Path, stopCondition: => Boolean = false)(f: PartialFunction[Event, Unit]) = {
+  def watch(watchPath: Path, stopCondition: => Boolean = false)(f: PartialFunction[Event, Unit]): Unit = {
 
     /**
      * This is so we only end up watching for events we can actually handle. Things get a little messier if we don't
