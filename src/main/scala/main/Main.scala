@@ -42,15 +42,6 @@ object Main extends App {
   }
   config()
 
-  var downloadSet = Set[Path]()
-  sys addShutdownHook {
-    if (!downloadSet.isEmpty) {
-      downloadSet foreach { filePath => {
-        logger.warning(s"$filePath's download was interrupted and was not moved.")
-      }}
-    }
-  }
-
   if (watchList.isEmpty)
     logger.warning(s"There are no move rules specified in $configFilePath.")
 
