@@ -7,7 +7,7 @@ import watch.Watcher._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, future}
 
-private class WatcherSpec extends Specification {
+class WatcherSpec extends Specification {
 
   // Directory used for each test should be different, as these tests will be executed in parallel.
   "Watcher" should {
