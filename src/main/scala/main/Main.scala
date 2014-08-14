@@ -1,20 +1,17 @@
 package main
 
 import java.io.FileReader
-import java.nio.file.{Path, Files, Paths}
+import java.nio.file.{Files, Path, Paths}
 
-import scala.concurrent.{Await, future, ExecutionContext}
-import ExecutionContext.Implicits.global
-
-import scala.concurrent.duration.Duration
-import watch.Watcher._
-import file.FileUtil
-import config.ConfigFileParser._
-import pathutil.RichPath._
 import com.twitter.logging.Logger
 import com.twitter.logging.config.{FileHandlerConfig, LoggerConfig}
-import java.util.concurrent.TimeUnit
-import scala.util.{Failure, Success}
+import config.ConfigFileParser._
+import _root_.file.FileMover
+import watch.Watcher._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, future}
 
 object Main extends App {
 
@@ -59,28 +56,9 @@ object Main extends App {
 
   val watchFutures = watchList map {
     case (watchPath, moveList) => {
-      def performMove(eventPath: Path) = {
-        moveList foreach {
-          case (moveParams, movePath) => {
-            if (moveParams contains (eventPath.extension)) {
-
-              logger.info(s"About to move $eventPath.")
-              downloadSet = downloadSet + eventPath
-              eventPath.downloadFinish(Duration.create(1, TimeUnit.HOURS)).onComplete {
-                case Success(_) => {
-                  logger.info(s"Moving $eventPath")
-                  val eventPathAfterMove = FileUtil.move(eventPath, movePath)
-                  logger.info(s"$eventPath moved to $eventPathAfterMove.")
-                  downloadSet = downloadSet - eventPath
-                }
-                case Failure(_) => {
-                  logger.error(s"$eventPath has not been moved. It took too long to download.")
-                  downloadSet = downloadSet - eventPath
-                }
-              }
-            }
-          }
-        }
+      val fileMovers = moveList map {
+        case (moveParams, movePath) =>
+          new FileMover(moveParams, movePath)
       }
 
       logger.info(s"Performing initial move of files in $watchPath.")
@@ -88,16 +66,14 @@ object Main extends App {
       val dirStream = Files newDirectoryStream watchPath
       val dirIt = dirStream.iterator
       while(dirIt.hasNext)
-        performMove(dirIt.next)
+        fileMovers.foreach(_.onEvent(dirIt.next))
       dirStream.close()
 
       logger.info(s"Watching $watchPath")
       future {
         watch(watchPath) {
           case Created(eventPath) => {
-            logger.info(s"File creation detected: $eventPath")
-
-            performMove(eventPath)
+            fileMovers.foreach(_.onEvent(eventPath))
           }
         }
       }
