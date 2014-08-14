@@ -11,6 +11,7 @@ import watch.Watcher._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Main extends App {
 
