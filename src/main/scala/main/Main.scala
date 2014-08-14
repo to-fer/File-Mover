@@ -6,7 +6,7 @@ import java.nio.file.{Files, Path, Paths}
 import com.twitter.logging.Logger
 import com.twitter.logging.config.{FileHandlerConfig, LoggerConfig}
 import config.ConfigFileParser._
-import _root_.file.FileMover
+import _root_.path.FileMover
 import watch.Watcher._
 
 import scala.concurrent.duration.Duration
@@ -18,7 +18,7 @@ object Main extends App {
   val homeDir = sys env "HOME"
   val configFilePath =
     if (osName.contains("Linux"))
-      Paths.get(homeDir, ".config", "file_mover", "file")
+      Paths.get(homeDir, ".config", "file_mover", "path")
     else if (osName.contains("Windows"))
       Paths.get(homeDir, ".file_mover", "move.txt")
     else
