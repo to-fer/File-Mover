@@ -1,17 +1,17 @@
 package main
 
 import java.io.FileReader
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Paths}
 
+import _root_.path.FileMover
 import com.twitter.logging.Logger
 import com.twitter.logging.config.{FileHandlerConfig, LoggerConfig}
 import config.ConfigFileParser._
-import _root_.path.FileMover
 import watch.Watcher._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, future}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 object Main extends App {
 
