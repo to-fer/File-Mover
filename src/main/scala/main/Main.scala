@@ -49,7 +49,7 @@ object Main extends App {
     case (watchPath, moveList) => {
       val fileMovers = moveList map {
         case (moveParams, movePath) =>
-          new FileMover(moveParams, movePath)
+          new FileMover(logger, moveParams, movePath)
       }
 
       logger.info(s"Performing initial move of files in $watchPath.")
