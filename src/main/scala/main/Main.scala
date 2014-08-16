@@ -56,8 +56,11 @@ object Main extends App {
       // Perform initial move on startup.
       val dirStream = Files newDirectoryStream watchPath
       val dirIt = dirStream.iterator
-      while(dirIt.hasNext)
-        fileMovers.foreach(_.onEvent(dirIt.next))
+      while(dirIt.hasNext) {
+        val nextDir = dirIt.next
+        fileMovers.foreach(_.onEvent(nextDir))
+      }
+
       dirStream.close()
 
       logger.info(s"Watching $watchPath")
