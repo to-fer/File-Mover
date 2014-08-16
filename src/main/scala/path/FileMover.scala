@@ -38,10 +38,6 @@ class FileMover(logger: Logger, moveExtentions: List[String], destPath: Path) {
       else
         logger.info(s"Ignoring duplicate event involving $eventPath.")
     }
-    else {
-      logger.info(s"Event path detected that doesn't match move rules: $eventPath")
-    }
-
   }
 
   def pathsPendingMove = _pathsPendingMove
