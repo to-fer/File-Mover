@@ -29,6 +29,7 @@ object Main extends App {
     Files.createFile(configFilePath)
   }
 
+  // TODO detect when move rule conflict.
   val configFileReader = new FileReader(configFilePath.toFile)
   val watchList = parseAll(file, configFileReader).get
   configFileReader.close()
