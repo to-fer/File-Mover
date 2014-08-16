@@ -19,7 +19,7 @@ object Main extends App {
   val homeDir = sys env "HOME"
   val configFilePath =
     if (osName.contains("Linux"))
-      Paths.get(homeDir, ".config", "file_mover", "path")
+      Paths.get(homeDir, ".config", "file_mover", "move")
     else if (osName.contains("Windows"))
       Paths.get(homeDir, ".file_mover", "move.txt")
     else
