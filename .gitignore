@@ -1,5 +1,15 @@
-.*
+*
+
 !.gitignore
-project
-target
-classes
+
+# Project sources.
+src/
+
+# Assembly plugin file.
+project/assembly.sbt
+
+# Sbt build definition.
+build.sbt
+
+# Assembly configuration.
+assembly.sbt
